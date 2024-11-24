@@ -58,7 +58,7 @@ class FilmeController {
                 Path tempFile = Files.createTempFile("upload-", imagem.getOriginalFilename());
                 imagem.transferTo(tempFile.toFile());
                 s3Service.uploadFile(fileName, tempFile);
-                imagemUrl = "https://nome-do-seu-bucket.s3.amazonaws.com/" + fileName;
+                imagemUrl = "https://projeto-bucket.s3.us-east-1.amazonaws.com/" + fileName;
             } catch (Exception e) {
                 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao fazer upload da imagem", e);
             }
@@ -94,7 +94,7 @@ class FilmeController {
                         Path tempFile = Files.createTempFile("upload-", imagem.getOriginalFilename());
                         imagem.transferTo(tempFile.toFile());
                         s3Service.uploadFile(fileName, tempFile);
-                        imagemUrl = "https://nome-do-seu-bucket.s3.amazonaws.com/" + fileName;
+                        imagemUrl = "https://projeto-bucket.s3.us-east-1.amazonaws.com/" + fileName;
                     } catch (Exception e) {
                         throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao fazer upload da imagem", e);
                     }

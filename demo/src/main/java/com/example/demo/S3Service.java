@@ -10,7 +10,7 @@ import java.nio.file.Path;
 public class S3Service {
 
     private final S3Client s3Client;
-    private final String bucketName = "nome-do-seu-bucket"; // Substitua pelo nome do seu bucket
+    private final String bucketName = "projeto-bucket"; // Substitua pelo nome do seu bucket
 
     public S3Service(S3Client s3Client) {
         this.s3Client = s3Client;
