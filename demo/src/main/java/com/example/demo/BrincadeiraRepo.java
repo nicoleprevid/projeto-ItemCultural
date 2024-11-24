@@ -1,8 +1,7 @@
 package com.example.demo;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-import org.springframework.data.repository.CrudRepository;
-
-public interface BrincadeiraRepo extends CrudRepository<Brincadeira, Long> {
+public interface BrincadeiraRepo extends JpaRepository<Brincadeira, Long> {
 
     Iterable<Brincadeira> findByHabilidadePrincipal(String habilidadePrincipal);
 }

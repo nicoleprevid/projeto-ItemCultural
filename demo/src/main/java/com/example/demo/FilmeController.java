@@ -21,7 +21,6 @@ class FilmeController {
     private FilmeRepo filmeRepo;
 
     public FilmeController() {
-
     }
 
     // Recupera todos os filmes ou por filtro opcional de ano de lançamento
@@ -47,15 +46,18 @@ class FilmeController {
 
     // Atualiza os dados de um filme pelo ID
     @PutMapping("/api/filmes/{filmeId}")
-    Optional<Filme> updateFilme(@RequestBody Filme filmeRequest, @PathVariable long filmeId) {
-        Optional<Filme> opt = filmeRepo.findById(filmeId);
-        if (opt.isPresent()) {
-            if (filmeRequest.getId() == filmeId) {
-                filmeRepo.save(filmeRequest);
-                return opt;
-            }
-        }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Erro ao alterar dados do filme com id " + filmeId);
+    Filme updateFilme(@RequestBody Filme filmeRequest, @PathVariable long filmeId) {
+        return filmeRepo.findById(filmeId)
+            .map(filme -> {
+                // Atualiza os campos do filme existente
+                filme.setNome(filmeRequest.getNome());
+                filme.setTempoDeDuracao(filmeRequest.getTempoDeDuracao());
+                filme.setAnoLancamento(filmeRequest.getAnoLancamento());
+                filme.setGenero(filmeRequest.getGenero());
+                return filmeRepo.save(filme); // Salva as alterações
+            })
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "Filme com ID " + filmeId + " não encontrado."));
     }
 
     // Deleta um filme pelo ID

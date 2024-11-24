@@ -43,18 +43,24 @@ class MusicaController {
         return createdMusica;
     }
 
-    @PutMapping("/api/musicas/{musicaId}")
-    Optional<Musica> updateMusica(@RequestBody Musica musicaRequest, @PathVariable long musicaId) {
-        Optional<Musica> opt = musicaRepository.findById(musicaId);
-        if (opt.isPresent()) {
-            if (musicaRequest.getId() == musicaId) {
-                musicaRepository.save(musicaRequest);
-                return opt;
-            }
-        }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                "Erro ao alterar dados da música com id " + musicaId);
+    @PutMapping("/api/musicas/{id}")
+    Musica updateMusica(@RequestBody Musica musicaRequest, @PathVariable long id) {
+        // Busca a música pelo ID
+        System.out.println("Chamou updateMusica");
+        return musicaRepository.findById(id)
+            .map(musica -> {
+                // Atualiza os campos da música existente
+                System.out.println("Chamou updateMusica com " + musica);
+                musica.setDuracao(musicaRequest.getDuracao());
+                musica.setCantor(musicaRequest.getCantor());
+                musica.setProdutor(musicaRequest.getProdutor());
+                musica.setAnoLancamento(musicaRequest.getAnoLancamento());
+                return musicaRepository.save(musica); // Salva as alterações
+            })
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, 
+                    "Música com ID " + id + " não encontrada."));
     }
+    
 
     @DeleteMapping("/api/musicas/{id}")
     void deleteMusica(@PathVariable long id) {

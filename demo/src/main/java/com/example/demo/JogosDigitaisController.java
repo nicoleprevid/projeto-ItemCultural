@@ -42,20 +42,26 @@ class JogosDigitaisController {
 		JogosDigitais createdJogo = jogosDigitaisRepo.save(jogo);
 		return createdJogo;
 	}
-
-	@PutMapping("/api/jogos/{jogoId}")
-	Optional<JogosDigitais> updateJogo(@RequestBody JogosDigitais jogoRequest, @PathVariable long jogoId) {
-		Optional<JogosDigitais> opt = jogosDigitaisRepo.findById(jogoId);
-		if (opt.isPresent()) {
-			if (jogoRequest.getId() == jogoId) {
-				jogosDigitaisRepo.save(jogoRequest);
-				return opt;
-			}
-		}
-		throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-				"Erro ao alterar dados do jogo com id " + jogoId);
+	@PutMapping("/api/jogos/{id}")
+	JogosDigitais updateJogo(@RequestBody JogosDigitais jogoRequest, @PathVariable long id) {
+		// Busca o jogo pelo ID
+		System.out.println("Chamou updateJogo");
+		return jogosDigitaisRepo.findById(id)
+			.map(jogo -> {
+				// Atualiza os campos do jogo existente
+				System.out.println("Chamou updateJogo com " + jogo);
+				jogo.setIdadeMinima(jogoRequest.getIdadeMinima());
+				jogo.setQtdeMinimaJogadores(jogoRequest.getQtdeMinimaJogadores());
+				jogo.setQtdeMaximaJogadores(jogoRequest.getQtdeMaximaJogadores());
+				jogo.setDuracaoMediaMinutos(jogoRequest.getDuracaoMediaMinutos());
+				jogo.setAnoLancamento(jogoRequest.getAnoLancamento());
+				jogo.setArea(jogoRequest.getArea());
+				return jogosDigitaisRepo.save(jogo); // Salva as alterações
+			})
+			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, 
+					"Jogo com ID " + id + " não encontrado."));
 	}
-
+	
 	@DeleteMapping("/api/jogos/{id}")
 	void deleteJogo(@PathVariable long id) {
 		jogosDigitaisRepo.deleteById(id);

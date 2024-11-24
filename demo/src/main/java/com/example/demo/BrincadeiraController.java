@@ -35,7 +35,9 @@ class BrincadeiraController {
     // Recupera uma brincadeira específica pelo ID
     @GetMapping("/api/brincadeiras/{id}")
     Optional<Brincadeira> getBrincadeira(@PathVariable long id) {
+        System.out.println("Chamou getBrincadeira com id" + id);
         return brincadeiraRepo.findById(id);
+        
     }
 
     // Cria uma nova brincadeira
@@ -45,17 +47,24 @@ class BrincadeiraController {
     }
 
     // Atualiza os dados de uma brincadeira pelo ID
-    @PutMapping("/api/brincadeiras/{brincadeiraId}")
-    Optional<Brincadeira> updateBrincadeira(@RequestBody Brincadeira brincadeiraRequest, @PathVariable long brincadeiraId) {
-        Optional<Brincadeira> opt = brincadeiraRepo.findById(brincadeiraId);
-        if (opt.isPresent()) {
-            if (brincadeiraRequest.getId() == brincadeiraId) {
-                brincadeiraRepo.save(brincadeiraRequest);
-                return opt;
-            }
-        }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Erro ao alterar dados da brincadeira com id " + brincadeiraId);
+    @PutMapping("/api/brincadeiras/{id}")
+    Brincadeira updateBrincadeira(@RequestBody Brincadeira brincadeiraRequest, @PathVariable long id) {
+        // Busca a brincadeira pelo ID
+        System.out.println("Chamou updateBrincadeira");
+        return brincadeiraRepo.findById(id)
+            .map(brincadeira -> {
+                // Atualiza os campos da brincadeira existente
+                System.out.println("Chamou updateBrincadeira com " + brincadeira);
+                brincadeira.setNome(brincadeiraRequest.getNome());
+                brincadeira.setQtdeMinimaJogadores(brincadeiraRequest.getQtdeMinimaJogadores());
+                brincadeira.setQtdeMaximaJogadores(brincadeiraRequest.getQtdeMaximaJogadores());
+                brincadeira.setHabilidadePrincipal(brincadeiraRequest.getHabilidadePrincipal());
+                return brincadeiraRepo.save(brincadeira); // Salva as alterações
+            })
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, 
+                    "Brincadeira com ID " + id + " não encontrada."));
     }
+
 
     // Deleta uma brincadeira pelo ID
     @DeleteMapping("/api/brincadeiras/{id}")
@@ -63,3 +72,4 @@ class BrincadeiraController {
         brincadeiraRepo.deleteById(id);
     }
 }
+

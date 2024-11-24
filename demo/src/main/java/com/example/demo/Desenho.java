@@ -6,35 +6,38 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 @Entity
-public class Desenho extends ItemCultural{
-    
+public class Desenho {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private int episodios;
+    
+    private String nome;
     private int temporadas;
-    private int classificacao;
-    private int duracaoEpisodio; // em minutos
     private int anoLancamento;
 
     // Construtor vazio
     public Desenho() {}
 
     // Construtor com parâmetros
-    public Desenho(String nome, int episodios, int temporadas, int classificacao, int duracaoEpisodio, int anoLancamento) {
-        this.episodios = episodios;
+    public Desenho(String nome, int temporadas, int anoLancamento) {
+        this.nome = nome;
         this.temporadas = temporadas;
-        this.classificacao = classificacao;
-        this.duracaoEpisodio = duracaoEpisodio;
         this.anoLancamento = anoLancamento;
     }
 
-    public int getEpisodios() {
-        return episodios;
+    // Getters e setters
+
+    public Long getId() {
+        return id;
     }
 
-    public void setEpisodios(int episodios) {
-        this.episodios = episodios;
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
     public int getTemporadas() {
@@ -43,22 +46,6 @@ public class Desenho extends ItemCultural{
 
     public void setTemporadas(int temporadas) {
         this.temporadas = temporadas;
-    }
-
-    public int getClassificacao() {
-        return classificacao;
-    }
-
-    public void setClassificacao(int classificacao) {
-        this.classificacao = classificacao;
-    }
-
-    public int getDuracaoEpisodio() {
-        return duracaoEpisodio;
-    }
-
-    public void setDuracaoEpisodio(int duracaoEpisodio) {
-        this.duracaoEpisodio = duracaoEpisodio;
     }
 
     public int getAnoLancamento() {

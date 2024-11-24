@@ -2,20 +2,35 @@ package com.example.demo;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 @Entity
-public class Brincadeira extends ItemCultural{
-
-    @Id @GeneratedValue
+public class Brincadeira{
+    
+    @Id 
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    private String nome;
     private int qtdeMinimaJogadores;
     private int qtdeMaximaJogadores;
     private String habilidadePrincipal;
 
     public Brincadeira() {
         super();
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
     public int getQtdeMinimaJogadores() {

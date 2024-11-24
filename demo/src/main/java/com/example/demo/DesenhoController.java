@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestController
-
 class DesenhoController {
 
     @Autowired
@@ -44,16 +43,20 @@ class DesenhoController {
     }
 
     @PutMapping("/api/desenhos/{desenhoId}")
-    Optional<Desenho> updateDesenho(@RequestBody Desenho desenhoRequest, @PathVariable long desenhoId) {
-        Optional<Desenho> opt = desenhoRepo.findById(desenhoId);
-        if (opt.isPresent()) {
-            if (desenhoRequest.getId() == desenhoId) {
-                desenhoRepo.save(desenhoRequest);
-                return opt;
-            }
-        }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                "Erro ao alterar dados do desenho com id " + desenhoId);
+    Desenho updateDesenho(@RequestBody Desenho desenhoRequest, @PathVariable long desenhoId) {
+        System.out.println("Chamou updateDesenho");
+
+        return desenhoRepo.findById(desenhoId)
+            .map(desenho -> {
+                // Atualiza os campos da desenho existente
+                System.out.println("Chamou updateDesenho com " + desenho);
+                desenho.setNome(desenhoRequest.getNome());
+                desenho.setTemporadas(desenhoRequest.getTemporadas());
+                desenho.setAnoLancamento(desenhoRequest.getAnoLancamento());
+                return desenhoRepo.save(desenho); // Salva as alterações
+            })
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "Desenho com ID " + desenhoId + " não encontrado."));
     }
 
     @DeleteMapping("/api/desenhos/{id}")
