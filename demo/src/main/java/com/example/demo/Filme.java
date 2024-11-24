@@ -14,7 +14,8 @@ public class Filme {
     private String tempoDeDuracao;
     private int anoLancamento;
     private String genero;
-    
+    private String imagemUrl;
+
     public Filme() {
         super();
     }
@@ -58,5 +59,13 @@ public class Filme {
 
     public void setGenero(String genero) {
         this.genero = genero;
+    }
+
+    public String getImagemUrl() {
+        return imagemUrl;
+    }
+
+    public void setImagemUrl(String imagemUrl) {
+        this.imagemUrl = imagemUrl;
     }
 }
