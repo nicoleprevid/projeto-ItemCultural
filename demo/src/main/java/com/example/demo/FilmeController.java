@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import java.io.Console;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -42,30 +43,34 @@ class FilmeController {
         }
         return filmeRepo.findAll();
     }
+    
     @GetMapping("/api/filmes/{id}/imagem")
-    public ResponseEntity<Resource> getImage(@PathVariable Long id) {
+    public ResponseEntity<String> getImageUrl(@PathVariable Long id) {
         try {
             // Buscar o filme pelo ID
-            Optional<Filme> filmeOptional = filmeRepo.findById(id);
-            if (filmeOptional.isEmpty()) {
+            Optional<Filme> filme = filmeRepo.findById(id);
+            if (filme.isEmpty()) {
+                System.out.println("Filme não encontrado com ID: " + id);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
-    
+
             // Pegar a URL da imagem do filme
-            String imagemUrl = filmeOptional.get().getImagemUrl();
+            String imagemUrl = filme.get().getImagemUrl();
             if (imagemUrl == null || imagemUrl.isEmpty()) {
+                System.out.println("Imagem não encontrada para o filme com ID: " + id);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
-    
-            // Criar o recurso a partir da URL da imagem
-            URL url = new URL(imagemUrl);
-            Resource fileResource = (Resource) new UrlResource(url.toURI());
-    
-            return ResponseEntity.ok()
-                    .contentType(MediaType.IMAGE_JPEG) // Ajuste o tipo conforme necessário
-                    .body(fileResource);
+
+            // Gerar URL pré-assinada
+            String presignedUrl = s3Service.generatePresignedUrl(imagemUrl);
+            if (presignedUrl == null) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            }
+
+            // Retornar a URL pré-assinada como resposta
+            return ResponseEntity.ok(presignedUrl.toString());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
     

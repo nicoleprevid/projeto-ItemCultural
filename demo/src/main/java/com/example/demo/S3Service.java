@@ -5,9 +5,15 @@ import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.util.Date;
 
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
@@ -15,6 +21,9 @@ import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import com.amazonaws.HttpMethod;
+import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 
 @Service
 public class S3Service {
@@ -39,6 +48,7 @@ public class S3Service {
             return "Erro no upload: " + e.getMessage();
         }
     }
+    
     // Novo método para obter arquivos
     public ResponseEntity<byte[]> getFile(String fileName) {
         try {
@@ -77,6 +87,36 @@ public class S3Service {
             return MediaType.APPLICATION_PDF;
         }
         return MediaType.APPLICATION_OCTET_STREAM;
+    }
+    public String generatePresignedUrl(String imagemUrl) {
+        try {
+            // Verifique se a imagemUrl não está vazia
+            if (imagemUrl == null || imagemUrl.isEmpty()) {
+                throw new IllegalArgumentException("URL da imagem não pode ser vazia");
+            }
+
+            // Extrair a chave do objeto (objectKey) da URL completa
+            String objectKey = imagemUrl.replace("https://" + bucketName + ".s3.amazonaws.com/", "");
+
+            // Criar um S3Presigner
+            try (S3Presigner presigner = S3Presigner.create()) {
+
+                // Criar a requisição de assinatura
+                GetObjectPresignRequest getObjectPresignRequest = GetObjectPresignRequest.builder()
+                        .signatureDuration(Duration.ofHours(1)) // Expiração da URL
+                        .getObjectRequest(req -> req.bucket(bucketName).key(objectKey)) // Definir bucket e chave
+                        .build();
+
+                // Gerar a URL pré-assinada
+                PresignedGetObjectRequest presignedGetObjectRequest = presigner.presignGetObject(getObjectPresignRequest);
+
+                // Retornar a URL como String
+                return presignedGetObjectRequest.url().toString();
+            }
+        } catch (Exception e) {
+            e.printStackTrace(); // Log do erro
+            throw new RuntimeException("Erro ao gerar URL pré-assinada: " + e.getMessage());
+        }
     }
 
 }
