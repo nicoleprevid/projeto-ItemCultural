@@ -1,11 +1,15 @@
 package com.example.demo;
 
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+
+import jakarta.annotation.Resource;
 
 @RestController
 class FilmeController {
@@ -36,6 +42,33 @@ class FilmeController {
         }
         return filmeRepo.findAll();
     }
+    @GetMapping("/api/filmes/{id}/imagem")
+    public ResponseEntity<Resource> getImage(@PathVariable Long id) {
+        try {
+            // Buscar o filme pelo ID
+            Optional<Filme> filmeOptional = filmeRepo.findById(id);
+            if (filmeOptional.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+    
+            // Pegar a URL da imagem do filme
+            String imagemUrl = filmeOptional.get().getImagemUrl();
+            if (imagemUrl == null || imagemUrl.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+    
+            // Criar o recurso a partir da URL da imagem
+            URL url = new URL(imagemUrl);
+            Resource fileResource = (Resource) new UrlResource(url.toURI());
+    
+            return ResponseEntity.ok()
+                    .contentType(MediaType.IMAGE_JPEG) // Ajuste o tipo conforme necessário
+                    .body(fileResource);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+    
 
     // Recupera um filme específico pelo ID
     @GetMapping("/api/filmes/{id}")

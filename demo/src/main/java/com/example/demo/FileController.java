@@ -41,8 +41,4 @@ public class FileController {
     public ResponseEntity<byte[]> getFile(@PathVariable String fileName) {
         return s3Service.getFile(fileName);
     }
-
-    public S3Service getS3Service() {
-        return s3Service;
-    }
 }
